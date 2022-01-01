@@ -1,8 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
-
-import 'isar.g.dart';
+import 'quote.dart';
 
 class LoadQuotes extends StatefulWidget {
   final Isar isar;
@@ -35,19 +36,7 @@ class _LoadQuotesState extends State<LoadQuotes> {
           ),
           SizedBox(height: 10),
           ElevatedButton(
-            onPressed: () async {
-              try {
-                final bytes = await rootBundle.load('assets/quotes.json');
-                widget.isar.writeTxn((isar) async {
-                  await isar.quotes.importJsonRaw(bytes.buffer.asUint8List());
-                });
-              } catch (e) {
-                print(e);
-                setState(() {
-                  _error = e.toString();
-                });
-              }
-            },
+            onPressed: loadQuotes,
             child: Text('Load Quotes!'),
           ),
           SizedBox(height: 10),
@@ -55,5 +44,24 @@ class _LoadQuotesState extends State<LoadQuotes> {
         ],
       ),
     );
+  }
+
+  void loadQuotes() async {
+    try {
+      final bytes = await rootBundle.load('assets/quotes.json');
+      final jsonStr = Utf8Decoder().convert(bytes.buffer.asUint8List());
+      final json = jsonDecode(jsonStr) as List;
+      final quotes = json.map((e) => Quote()
+        ..text = e['text']
+        ..author = e['author']);
+      widget.isar.writeTxn((isar) async {
+        await isar.quotes.putAll(quotes.toList());
+      });
+    } catch (e) {
+      print(e);
+      setState(() {
+        _error = e.toString();
+      });
+    }
   }
 }

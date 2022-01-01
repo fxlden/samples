@@ -1,12 +1,16 @@
 import 'package:isar/isar.dart';
 
+part 'quote.g.dart';
+
 @Collection()
 class Quote {
   int? id;
 
-  @Index(caseSensitive: false, indexType: IndexType.words)
   late String text;
 
-  @Index(indexType: IndexType.hash)
+  @Index(caseSensitive: false, type: IndexType.value)
+  List<String> get textWords => Isar.splitWords(text);
+
+  @Index(type: IndexType.hash)
   late String author;
 }

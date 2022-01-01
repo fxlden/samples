@@ -5,8 +5,6 @@ import 'package:isar/isar.dart';
 import 'package:lazy_load_scrollview/lazy_load_scrollview.dart';
 import 'package:quotes/quote.dart';
 
-import 'isar.g.dart';
-
 class QuotesList extends StatefulWidget {
   final Isar isar;
 
@@ -49,7 +47,7 @@ class _QuotesListState extends State<QuotesList> {
           searchTermWords,
           (q, String word) => q.optional(
             word.isNotEmpty,
-            (q) => q.textWordStartsWith(word),
+            (q) => q.textWordsAnyStartsWith(word),
           ),
         )
         .filter()
